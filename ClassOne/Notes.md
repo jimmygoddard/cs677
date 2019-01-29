@@ -1,0 +1,90 @@
+# Data sets:
+- Pick our own data set which will be stock ticker data for any company whose name begins with the same letter as the first letter of our last name
+- We'll be using 5 years worth of data for that stock ticker
+
+# Homework
+- Every week
+
+# Quizzes
+- Every two weeks
+
+# Final Exam
+
+# Final Project
+- Open ended
+- Should _not_ be connected with the stock market
+
+# Book
+- Python for Data Analysis (i think i already have it)
+
+# Modules
+- Numpy
+- Pandas
+- Matplotlib
+
+# First assignment
+- Will be done in vanilla python.  don't use numpy or pandas
+- Step 1: run the script with your stock ticker and save the results into a csv file
+- Step 2: read the stock data into list of lists (lines... splitlines is giving just a list of strings)
+  - [line.split(',') for line in file.splitlines()] # will give list of lists
+- Implement the following strategies:
+  - if you decide to hold a stock for 1 day, what is the best day of the week to do so
+    - for every day of the week, construct a list of daily returns for that day
+    - compute avg, min and max for each of those lists
+    - result will be a table (basically list of lists. round everything to two decimal points):
+
+      day of week | min | max | avg | median
+
+      Monday      | mon_min | mon_max | mon_avg| mon_med
+  - if you decide to buy stock for one month, what would be the best/worst month
+    - take first return of month, last return of month and compute return for that month
+    - collect all of those monthly returns into lists and do the above analysis (same table as the daily analysis)
+    - [calculate daily return](https://www.sapling.com/6453081/calculate-daily-return): return = (p2 - p1 / p2)
+  
+  Trading strategies:
+  - if your stock is down W days in a row, buy on day W and sell next day: put $100 at adj closing price
+  
+  Example:
+  
+  Day 1 : -3%
+  
+  Day 2: -2%
+  
+  Day 3: -1%   adj Price = $10
+  
+  You buy 10 shares       
+
+  Next day, sell that number of shares at the adj close price
+  
+  "How many days should I wait sequentially before I buy"
+  
+  It's unlikely that you'll get something like 6 days in a row of a stock being down
+  
+  Example:
+  
+  For W = 1, 2, 3, 4, 5:
+  
+  After W consecutive declines, buy on day W ($100).  Sell on W + 1
+    
+  Generate following summary table:
+  
+  W     | # Transactions | # Profitable Trades | Profit per profitable trade | # Losing Trades | Average Loss per Losing Trade | Average P/L  
+
+  Same statistics as before: breakdown by losing and winning trades         
+
+# Compounded interest
+See ClassOne.py
+
+  - Optional assignment:
+  
+  assume you know tomorrow, start with a $100 (assume you never lose.  if tomorrow stock is higher then buy today.  if tomorrow stock is lower, sell today)
+
+  Q: how much money would you have on 12/31/2018?    
+
+# Tasks
+- Get historical stock data going back 5 years
+- 2 ways to do this: use Python script
+- (use pandas to get the data, but the rest needs to be done in straight python?  not sure what that means)
+- Set NaN values to 0
+- Split the date column into day, month, year, day of week.  that way you can answer questions like "is there a best day on which you should purchase stock?"
+
