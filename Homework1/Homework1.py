@@ -1,6 +1,8 @@
+import operator
 import os
 import statistics
 import calendar
+import itertools
 
 from orig_stock_data import get_stock
 
@@ -24,11 +26,11 @@ with open(output_file) as in_file:
     lines = [line.split(',') for line in in_file.read().splitlines()]
 
 
-def construct_returns_dict(by_column, key_formatter=lambda x: x):
+def construct_returns_dict(data_table, by_column, key_formatter=lambda x: x):
     returns_dict = {}
     by_column_idx = None
     return_idx = None
-    for i, line in enumerate(lines):
+    for i, line in enumerate(data_table):
         if i == 0:
             by_column_idx = line.index(by_column)
             return_idx = line.index('Return')
@@ -66,7 +68,7 @@ def get_max_average(values_dict):
     return average_dict
 
 
-weekday_dict = construct_returns_dict('Weekday')
+weekday_dict = construct_returns_dict(lines, 'Weekday')
 weekday_values = construct_values_dict(weekday_dict)
 
 print('{:9}\t{:6}\t{:6}\t{:6}\t{:6}'.format('Weekday', 'min', 'max', 'average', 'median'))
@@ -77,7 +79,7 @@ for day in weekday_values:
 max_weekday_avg = get_max_average(weekday_values)
 print('{key} has the highest average of {max}'.format(**max_weekday_avg))
 
-month_dict = construct_returns_dict('Month', lambda idx: calendar.month_name[int(idx)])
+month_dict = construct_returns_dict(lines, 'Month', lambda idx: calendar.month_name[int(idx)])
 month_values = construct_values_dict(month_dict)
 
 print()
@@ -87,3 +89,23 @@ for month in month_values:
 
 max_month_avg = get_max_average(month_values)
 print('{key} has the highest average of {max}'.format(**max_month_avg))
+
+
+return_idx = lines[0].index('Return')
+neg_indexes = [i + 1 for i, item in enumerate(lines[1:]) if float(item[return_idx]) < 0]
+
+# From https://stackoverflow.com/questions/2361945/detecting-consecutive-integers-in-a-list
+# Example of detecting consecutive integers: https://docs.python.org/2.6/library/itertools.html#examples
+# comments on SO post describe adjusting the 2.6 example for Python 3
+runs = []
+for k, g in itertools.groupby(enumerate(neg_indexes), lambda ix: ix[0] - ix[1]):
+     runs.append(list(map(operator.itemgetter(1), g)))
+
+
+greater_than_three = [run for run in runs if len(run) >= 3]
+print(greater_than_three[0])
+# Out[48]: [10, 11, 12, 13, 14, 15]
+print(greater_than_three[0][2::3])
+# Out[55]: [12, 15]
+
+# generalized that will be: greater_than_w[i][w -1::w]
