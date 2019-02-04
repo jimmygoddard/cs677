@@ -14,7 +14,9 @@ from orig_stock_data import get_stock
 
 def get_data_table():
     """
-    Retrieves stock data, writes it to a CSV file and returns it as a matrix
+    Retrieves stock data, writes it to a CSV file and returns it as a matrix.  Provided to us as is by the course
+    Professor
+
     :return: data table matrix
     """
     # ticker = 'GS'  # Goldman Sachs Group Inc
@@ -25,10 +27,9 @@ def get_data_table():
     end_date = '2018-12-31'
     s_window = 14
     l_window = 50
-    home_dir = os.path.join(os.path.sep + 'home', 'jgoddard')
-    # home_dir = os.path.join('C:', os.path.sep, 'Users', 'jimmy_000')
+    # home_dir = os.path.join(os.path.sep + 'home', 'jgoddard')  # Linux home directory
+    home_dir = os.path.join('C:', os.path.sep, 'Users', 'jimmy_000')  # MS Windows home directory
     input_dir = os.path.join(home_dir, 'src', 'git', 'CS677', 'datasets')
-    # input_dir = r'C:\Users\jimmy_000\src\git\cs677\datasets'
     output_file = os.path.join(input_dir, ticker + '.csv')
 
     if not os.path.isfile(output_file):
@@ -45,6 +46,7 @@ def get_data_table():
 def construct_returns_dict(data_table, by_column, key_formatter=lambda x: x):
     """
     Construct a dictionary from stock data matrix grouped by the by_column with a list of returns as the values
+
     :param data_table: matrix of stock data with the first row being the headers
     :param by_column: column to group by
     :param key_formatter: optional argument which will be used to format the by_column before it becomes a key in the
@@ -71,6 +73,7 @@ def construct_returns_dict(data_table, by_column, key_formatter=lambda x: x):
 def construct_values_dict(returns_dict):
     """
     Construct a dictionary of returns statistics for each grouping created by construct_returns_dict
+
     :param returns_dict: the output of the construct_returns_dict function
     :return: a dictionary containing statistics for each returns list in the returns_dict
     """
@@ -106,6 +109,7 @@ def get_max_average(values_dict):
 def print_weekday_analysis(weekday_values):
     """
     Helper function to print out the weekdays returned by the construct_values_dict function
+
     :param weekday_values: dictionary returned by the construct_values_dict when using by_column of 'Weekday'
     :return: void
     """
@@ -122,6 +126,7 @@ def print_weekday_analysis(weekday_values):
 def print_month_analysis(month_values):
     """
     Helper function to print out the months returned by the construct_values_dict function
+
     :param month_values: dictionary returned by the construct_values_dict when using by_column of 'Month'
     :return: void
     """
@@ -138,6 +143,7 @@ def print_month_analysis(month_values):
 def get_runs(data_table):
     """
     Return a list of lists containing the indexes of all negative Return runs in the data table
+
     :param data_table: a matrix of stock values with the first row being the headers
     :return: a list of lists containing the row indexes for the data table of all negative Return runs in the data table
     """
@@ -156,6 +162,7 @@ def get_runs(data_table):
 def get_run_end_indexes(runs, w):
     """
     Given a list of lists of runs and a window size, return all indexes that mark the of a run of that window size
+
     :param runs: list of lists of runs row index numbers
     :param w: size of the runs window
     :return: flat list of all row indexes marking the end of a run of length w
@@ -169,6 +176,7 @@ def get_trades(runs, data_table):
     """
     Construct a list of lists.  Each index in the outer list corresponds to a list of trades where the index equals w -1
     and w is the window size.  This function will construct this matrix for w equal to 1, 2, 3, 4, and 5
+
     :param runs: list of lists of indexes corresponding to negative returns runs
     :param data_table: matrix of stock data with the first row being the headers
     :return: list of lists of trades constructed from the runs passed in. each list in the list contains data for
@@ -192,6 +200,7 @@ def get_trades(runs, data_table):
 def get_num_trades(trades):
     """
     Helper function to get the number of trades
+
     :param trades: list of trades
     :return: number of trades
     """
@@ -201,6 +210,7 @@ def get_num_trades(trades):
 def get_num_profitable_trades(trades):
     """
     Helper function to count the number of profitable trades
+
     :param trades: list of trades
     :return: number of profitable trades
     """
@@ -210,6 +220,7 @@ def get_num_profitable_trades(trades):
 def get_num_losing_trades(trades):
     """
     Helper function to count the number of losing trades
+
     :param trades: list of trades
     :return: number of losing trades
     """
@@ -219,6 +230,7 @@ def get_num_losing_trades(trades):
 def get_profit_per_profitable_trade(trades):
     """
     Helper function to calculate the average profit per profitable trade
+
     :param trades: list of trades
     :return: mean of profitable trades
     """
@@ -228,6 +240,7 @@ def get_profit_per_profitable_trade(trades):
 def get_loss_per_losing_trade(trades):
     """
     Helper function to calculate the average loss per losing trade
+
     :param trades: list of trades
     :return: mean of losing trades
     """
@@ -237,6 +250,7 @@ def get_loss_per_losing_trade(trades):
 def print_trade_analysis(trades):
     """
     Pretty print the trades
+
     :param trades: list of trades
     :return: void
     """
@@ -257,6 +271,7 @@ def print_trade_analysis(trades):
 def get_trades_strategy_two(data_table):
     """
     Execute the second trading strategy
+
     :param data_table: matrix of stock data with the first row being the headers
     :return: list of trades
     """
@@ -285,6 +300,7 @@ def get_trades_strategy_two(data_table):
 def print_strategy_two_trades(trades):
     """
     Pretty print the trades returned by get_trades_strategy_two
+
     :param trades: list of trades
     :return: void
     """
@@ -303,26 +319,27 @@ def print_strategy_two_trades(trades):
 def main():
     """
     Main procedure
+
     :return: void
     """
     data_table = get_data_table()
 
-    # data broken out by weekday
+    # Homework Question 1 - data broken out by weekday
     weekday_dict = construct_returns_dict(data_table, 'Weekday')
     weekday_values = construct_values_dict(weekday_dict)
     print_weekday_analysis(weekday_values)
 
-    # data broken out by month
+    # Homework Question 2 - data broken out by month
     month_dict = construct_returns_dict(data_table, 'Month', lambda idx: calendar.month_name[int(idx)])
     month_values = construct_values_dict(month_dict)
     print_month_analysis(month_values)
 
-    # data broken out by trading strategy one
+    # Homework Question 3, Trading Strategy 1
     runs = get_runs(data_table)
     trades = get_trades(runs, data_table)
     print_trade_analysis(trades)
 
-    # data broken out by trading strategy two
+    # Homework Question 3, Trading Strategy 2
     trades = get_trades_strategy_two(data_table)
     print_strategy_two_trades(trades)
 
