@@ -27,8 +27,8 @@ def get_data_table():
     end_date = '2018-12-31'
     s_window = 14
     l_window = 50
-    # home_dir = os.path.join(os.path.sep + 'home', 'jgoddard')  # Linux home directory
-    home_dir = os.path.join('C:', os.path.sep, 'Users', 'jimmy_000')  # MS Windows home directory
+    home_dir = os.path.join(os.path.sep + 'home', 'jgoddard')  # Linux home directory
+    # home_dir = os.path.join('C:', os.path.sep, 'Users', 'jimmy_000')  # MS Windows home directory
     input_dir = os.path.join(home_dir, 'src', 'git', 'CS677', 'datasets')
     output_file = os.path.join(input_dir, ticker + '.csv')
 
@@ -116,7 +116,7 @@ def print_weekday_analysis(weekday_values):
     print()
     print('{:9}\t{:6}\t{:6}\t{:6}\t{:6}'.format('Weekday', 'min', 'max', 'average', 'median'))
     for day in weekday_values:
-        print('{weekday:9}\t{min:6.2f}\t{max:6.2f}\t{average:6.2f}\t{median:6.2f}'.format(
+        print('{weekday:9}\t{min:6.2f}\t{max:6.2f}\t{average:6}\t{median:6.2f}'.format(
             weekday=day, **weekday_values[day]))
 
     max_weekday_avg = get_max_average(weekday_values)

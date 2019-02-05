@@ -24,7 +24,7 @@ def get_stock(ticker, start_date, end_date, s_window, l_window):
         df['Weekday'] = df['Date'].dt.weekday_name  
         df['Short_MA'] = df['Adj Close'].rolling(window=s_window, min_periods=1).mean()
         df['Long_MA'] = df['Adj Close'].rolling(window=l_window, min_periods=1).mean()        
-        col_list = ['Date', 'Year', 'Month', 'Day', 'Weekday',
+        col_list = ['Date', 'Year', 'Month', 'Day', 'Weekday', 'Open',
                     'High', 'Low', 'Close', 'Volume', 'Adj Close',
                     'Return', 'Short_MA', 'Long_MA']
         df = df[col_list]
