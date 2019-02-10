@@ -1,6 +1,6 @@
 import os
 import pandas as pd
-from orig_stock_data import get_stock
+from stock_data import get_stock
 
 
 # ticker = 'GS'  # Goldman Sachs Group Inc

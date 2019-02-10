@@ -9,7 +9,7 @@ import operator
 import os
 import statistics
 
-from orig_stock_data import get_stock
+from stock_data import get_stock
 
 
 def get_data_table():
