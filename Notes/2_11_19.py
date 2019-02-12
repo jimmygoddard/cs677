@@ -120,3 +120,63 @@ print(y)
 # [ 0  1  2  3 44  5  6  7  8  9]
 # [ 0  1 44  3 44  5  6  7  8  9]
 
+# trimmed mean:  remove max, remove min and compute mean over the remaining elements
+x = np.array([2, 3, -10, 10, 7])
+x.mean()
+# 2.4
+y = np.array([2, 3, 7])
+y.mean()  # this would be the trimmed mean of x
+# 4.0
+
+np.delete(x, [x.argmin(), x.argmax()]).mean()  # another trimmed mean
+# you can extend trimmed mean to percentiles -- so remove the top 5% and the bottom 5%
+
+x_points = np.arange(-2, 3, 1)
+y_points = np.arange(-1, 2, 1)
+
+xs, ys = np.meshgrid(x_points, y_points)
+z = np.round(np.sqrt(xs**2, ys**2), 2)  # this is in example, but doesn't work
+
+y = np.arange(1, 37).reshape(6, 6)
+# array([[ 1,  2,  3,  4,  5,  6],
+#        [ 7,  8,  9, 10, 11, 12],
+#        [13, 14, 15, 16, 17, 18],
+#        [19, 20, 21, 22, 23, 24],
+#        [25, 26, 27, 28, 29, 30],
+#        [31, 32, 33, 34, 35, 36]])
+
+print(y[1, 2])
+print(y[1][2])
+print(y[2, :])  # third row
+print(y[2, ])   # same thing
+print(y[:, 2])  # third column
+
+print(y[[1, 2, 5], ])   # prints second, third, and 6th row
+print(np.sum(y[[1, 2, 5], ], axis=1))  # add each of the three rows separately
+# out: array([ 57,  93, 201])
+
+print(y[1::2, ])  # print every other row starting with the second row
+print(y[::2, ::3])  # every second row, every third column
+print(y[::-1, ::-1])  # everything in reverse
+print(y[:, 4])
+# out: [ 5 11 17 23 29 35]
+print(y[:, [4]])
+# [[ 5]
+#  [11]
+#  [17]
+#  [23]
+#  [29]
+#  [35]]
+
+# add the 1x1 and then the 2x2 and then the 3x3...
+for n in range(1, y.shape[0] + 1):
+    print(np.sum(y[:n, :n]))
+
+# A matrix is symmetric if Aij = Aji (basically if A == np.transpose(A)
+# check if one matrix is symmetric?
+z = abs(y - y.transpose())
+# z is symmetric
+z - z.transpose() == 0
+# all true
+# but still not great without visually inspecting it
+z - z.transpose()   # will give all zeros
