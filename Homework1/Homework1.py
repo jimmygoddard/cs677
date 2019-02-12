@@ -19,10 +19,10 @@ def get_data_table():
 
     :return: data table matrix
     """
-    # ticker = 'GS'  # Goldman Sachs Group Inc
+    ticker = 'GS'  # Goldman Sachs Group Inc
     # ticker = 'GDDY'  # GoDaddy
     # ticker = 'GM'  # General Motors
-    ticker = 'GRUB'  # GrubHub
+    # ticker = 'GRUB'  # GrubHub
     start_date = '2014-01-01'
     end_date = '2018-12-31'
     s_window = 14
