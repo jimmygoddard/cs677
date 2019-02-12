@@ -9,8 +9,8 @@ import pandas as pd
 
 from stock_data import get_stock
 
-home_dir = os.path.join('C:', os.path.sep, 'Users', 'jimmy_000')  # MS Windows home directory
-# home_dir = os.path.join(os.path.sep + 'home', 'jgoddard')  # Linux home directory
+# home_dir = os.path.join('C:', os.path.sep, 'Users', 'jimmy_000')  # MS Windows home directory
+home_dir = os.path.join(os.path.sep + 'home', 'jgoddard')  # Linux home directory
 input_dir = os.path.join(home_dir, 'src', 'git', 'CS677', 'datasets')
 
 
@@ -255,15 +255,36 @@ print(len(two_items[two_items == 1]))
 
 # We will need the following numbers of baristas on each day of the week assuming each barista can handle 60
 # transactions per hour
-print(np.ceil(bakery_df['Transaction'].groupby(bakery_df['Weekday']).count() / 60))
-# Weekday
-# Friday       54.0
-# Monday       40.0
-# Saturday     81.0
-# Sunday       54.0
-# Thursday     46.0
-# Tuesday      42.0
-# Wednesday    41.0
+print(np.ceil(bakery_df['Transaction'].groupby(bakery_df['Hour']).count() / 60))
+# Hour
+# 1      1.0
+# 7      1.0
+# 8     12.0
+# 9     35.0
+# 10    47.0
+# 11    54.0
+# 12    51.0
+# 13    47.0
+# 14    46.0
+# 15    36.0
+# 16    23.0
+# 17     7.0
+# 18     2.0
+# 19     1.0
+# 20     1.0
+# 21     1.0
+# 22     1.0
+# 23     1.0
+
+drinks_df = bakery_df[bakery_df['Type'] == 'Drink']
+print(np.ceil(drinks_df['Type'].groupby(drinks_df['Hour']).count() / 60))
+# Hour
+# 7      1.0
+# 8      4.0
+# 9     14.0
+# 10    19.0
+# 11    22.0
+# 12    19.0
 
 # I used the following loop to interactively construct a mapping of food to type
 # item_to_type = {}
