@@ -157,7 +157,9 @@ def construct_second_strategy_data(df):
     data = []
     for short_w in w_values:
         for long_w in w_values:
-            pnl = second_strategy(df, short_w, long_w)
+            if short_w > long_w:
+                continue
+            pnl = trade_strategy_two(df, short_w, long_w)
             if len(pnl) > 0:
                 data.append({'short_w': short_w, 'long_w': long_w, 'value': statistics.mean(pnl)})
     return data
@@ -175,7 +177,7 @@ def get_long_ma(df, w):
     return s
 
 
-def second_strategy(df, short_w, long_w):
+def trade_strategy_two(df, short_w, long_w):
     new_df = pd.concat([df[HEADER_PRICE], get_short_ma(df, short_w), get_long_ma(df, long_w)], axis=1)
     current_balance = 100
     stock_buys = []
@@ -197,8 +199,8 @@ def second_strategy(df, short_w, long_w):
 
 
 def get_second_strategy_plotting_data(data):
-    x_values = list(map(lambda datum: datum['short_w'], data))
-    y_values = list(map(lambda datum: datum['long_w'], data))
+    x_values = list(map(lambda datum: datum['long_w'], data))
+    y_values = list(map(lambda datum: datum['short_w'], data))
     data_values = list(map(lambda datum: datum['value'], data))
     color_values = list(map(lambda datum: 'g' if datum['value'] > 0 else 'r', data))
     return x_values, y_values, data_values, color_values
