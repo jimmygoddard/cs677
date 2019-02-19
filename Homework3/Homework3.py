@@ -1,3 +1,9 @@
+"""
+Jimmy Goddard
+2/18/19
+CS 677 Data Analytics with Python
+Homework 3
+"""
 import datetime
 import os
 import platform
