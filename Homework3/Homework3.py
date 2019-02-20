@@ -225,14 +225,21 @@ gs_df['Good_Week'] = gs_df[HEADER_WEEK].apply(label_good_weeks(positive_week_dat
 bollinger_data = construct_bollinger_data_points(gs_df)
 x, y, values, colors = get_bollinger_plotting_data(bollinger_data)
 
+#  x is W, y is K, radius is scaled average gain/loss percent
 s = [abs(value * 5000) for value in values]
+plt.xlabel('Window Size (w)')
+plt.ylabel('Number of Standard Deviations (k)')
 plt.scatter(x=x, y=y, s=s, c=colors)
 plt.show()
 
 # Assignment 3
 second_strategy_data = construct_second_strategy_data(gs_df)
 x, y, values, colors = get_second_strategy_plotting_data(second_strategy_data)
+
+# x is long window, y is short window, radius is average gain/loss
 s = [abs(value * 5000) for value in values]
+plt.xlabel('Long Window Size (long_w)')
+plt.ylabel('Short Window Size (short_w)')
 plt.scatter(x=x, y=y, s=s, c=colors)
 plt.show()
 
