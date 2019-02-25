@@ -1,3 +1,8 @@
+"""
+Jimmy Goddard
+2/24/19
+CS 677 Assignment 4
+"""
 import datetime
 import os
 import platform
