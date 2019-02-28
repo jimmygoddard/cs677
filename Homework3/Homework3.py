@@ -90,7 +90,7 @@ def get_data_table():
 
 
 def get_week(local_date):
-    date_format = '%Y-%M-%d'
+    date_format = '%Y-%m-%d'
     dt = datetime.datetime.strptime(local_date, date_format)
     start = dt - datetime.timedelta(days=dt.weekday())
     return start.strftime(date_format)
