@@ -47,8 +47,8 @@ Long position: buy at open, sell at close
 
 Short position: sell short ("short" because you don't own the stock) at open, buy at close
   Profit: (open - close) * num_shares
-  num_shares on wed: 92/100 = 0.92 shares
-  profit on wed: (92 - 90) * num_shares = 1.84
+  num_shares on wed: 100/92 = 1.08696 shares
+  profit on wed: (92 - 90) * num_shares = 2.17391
 
 If open price == close of previous day, you do nothing
 
