@@ -126,6 +126,24 @@ def inertia_strategy(df, r=-100):
                 pnl.append((close_price - open_price) * num_stocks)
     return pnl
 
+def reverse_inertia_strategy(df, r=-100):
+    current_balance = 100
+    pnl = []
+    for index, row in df.iterrows():
+        overnight_gain = row[HEADER_OVERNIGHT]
+        open_price = row[HEADER_OPEN]
+        close_price = row[HEADER_PRICE]
+        if overnight_gain * 100 > r:  # willing to trade
+            if overnight_gain == 0:  # do nothing
+                continue
+            elif overnight_gain > 0:  # sell short
+                num_stocks = current_balance / open_price
+                pnl.append((open_price - close_price) * num_stocks)
+            else:  # long position
+                num_stocks = current_balance / open_price
+                pnl.append((close_price - open_price) * num_stocks)
+    return pnl
+
 
 def get_num_trades(trades):
     """
@@ -226,6 +244,11 @@ print_trade_analysis(pnl)
 # Trades	# Profitable Trades	Profit per Profitable Trade	# Losing Trades	Loss per Losing Trade
 #    251	                 44	                       1.06	            207	                -1.74
 
+# reverse strategy
+reverse_pnl = reverse_inertia_strategy(gs_2018)
+print_trade_analysis(reverse_pnl)
+
+
 # Task 1 part b
 plt.scatter(x=gs_2018[HEADER_OVERNIGHT].values, y=gs_2018[HEADER_RETURN].values)
 plt.xlabel('Overnight Return')
@@ -246,14 +269,21 @@ x = range(-10, 11, 1)
 y = []
 for r in x:
     pnl = inertia_strategy(gs_2018, r)
-    print('x: {}'.format(r))
-    print('len pnl: {}'.format(len(pnl)))
     if len(pnl) > 0:
         y.append(statistics.mean(pnl))
     else:
         y.append(None)
 
-plt.scatter(x=x, y=y)
+x = range(-10, 11, 1)
+reverse_y = []
+for r in x:
+    reverse_pnl = reverse_inertia_strategy(gs_2018, r)
+    if len(reverse_pnl) > 0:
+        reverse_y.append(statistics.mean(reverse_pnl))
+    else:
+        reverse_y.append(None)
+
+plt.scatter(x=x, y=reverse_y)
 plt.title('Average gain per R value')
 plt.xlabel('R Value')
 plt.ylabel('Average gain')
@@ -261,6 +291,7 @@ plt.show()
 
 # Task 2
 tips = sns.load_dataset('tips')
+tips['percentage'] = ((tips['tip'] / tips['total_bill']) * 100).round(2)
 # question 1
 print(tips.groupby(['time'])['tip'].mean())
 # time
@@ -278,6 +309,15 @@ print(tips.groupby(['day', 'time'])['tip'].mean())
 # Sat   Dinner    2.993103
 # Sun   Dinner    3.255132
 # Name: tip, dtype: float64
+print(tips.groupby(['day', 'time'])['percentage'].mean())
+# day   time
+# Thur  Lunch     16.129016
+#       Dinner    15.970000
+# Fri   Lunch     18.875714
+#       Dinner    15.892500
+# Sat   Dinner    15.314598
+# Sun   Dinner    16.689605
+# Name: percentage, dtype: float64
 
 # question 3
 sns.regplot(x="total_bill", y="tip", data=tips)
@@ -286,13 +326,30 @@ plt.xlabel('Total Bill')
 plt.ylabel('Tip')
 plt.show()
 
-print(tips[['total_bill', 'tip']].corr())
+print(tips[['total_bill', 'percentage']].corr())
 #             total_bill       tip
 # total_bill    1.000000  0.675734
 # tip           0.675734  1.000000
 
+print(tips[['tip', 'percentage']].corr())
+#                  tip  percentage
+# tip         1.000000    0.342361
+# percentage  0.342361    1.000000
+
+sns.regplot(x="tip", y="percentage", data=tips)
+plt.title('Tip Percentage vs Tip')
+plt.xlabel('Tip')
+plt.ylabel('Tip percentage')
+plt.show()
+
+sns.regplot(x="total_bill", y="percentage", data=tips)
+plt.title('Total bill vs Tip Percentage')
+plt.xlabel('Total Bill')
+plt.ylabel('Tip Percentage')
+plt.show()
+
+print(tips[['total_bill', 'tip']].corr())
 # question 4
-tips['percentage'] = ((tips['tip'] / tips['total_bill']) * 100).round(2)
 sns.regplot(x='total_bill', y='percentage', data=tips)
 plt.title('Total bill vs Tip percentage')
 plt.xlabel('Total Bill')
@@ -323,6 +380,9 @@ plt.show()
 sns.boxplot(x='smoker', y='tip', data=tips)
 plt.show()
 
+sns.boxplot(x='smoker', y='percentage', data=tips)
+plt.show()
+
 # question 9
 print(tips.groupby(['day'])['tip'].mean())
 # day
@@ -331,6 +391,14 @@ print(tips.groupby(['day'])['tip'].mean())
 # Sat     2.993103
 # Sun     3.255132
 # Name: tip, dtype: float64
+print(tips.groupby(['day'])['percentage'].mean())
+# day
+# Thur    16.126452
+# Fri     16.991579
+# Sat     15.314598
+# Sun     16.689605
+# Name: percentage, dtype: float64
+
 
 # question 10
 sns.catplot(x='smoker', col='sex', kind='count', data=tips)
@@ -338,7 +406,6 @@ plt.show()
 
 males = tips[tips['sex'] == 'Male']
 females = tips[tips['sex'] != 'Male']
-male_smokers = tips[tips['smoker'] == 'Yes']
 male_smokers = males[males['smoker'] == 'Yes']
 female_smokers = females[females['smoker'] == 'Yes']
 print(len(male_smokers) / len(males))

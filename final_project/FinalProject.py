@@ -77,3 +77,15 @@ plt.legend(loc='upper left')
 plt.title('')
 plt.show()
 
+# gender analytics
+sex_year_df = df[['year', 'sex']]
+sex_year_df_grouped = sex_year_df.groupby(['year', 'sex']).size().reset_index(name='counts')
+
+# number of each type of gender plotted per year, might want to also show just male/female
+sns.lineplot(x='year', y='counts', hue='sex', data=sex_year_df_grouped)
+plt.show()
+
+# maybe also show the same type of plot, but count id (secret, public, etc.) hair color, eye color
+
+# can do appearances by gender too
+app_by_gender = df[['']]
