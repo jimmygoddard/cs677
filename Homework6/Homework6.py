@@ -126,6 +126,7 @@ def inertia_strategy(df, r=-100):
                 pnl.append((close_price - open_price) * num_stocks)
     return pnl
 
+
 def reverse_inertia_strategy(df, r=-100):
     current_balance = 100
     pnl = []

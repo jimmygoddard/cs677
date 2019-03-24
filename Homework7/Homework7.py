@@ -7,12 +7,12 @@ import datetime
 import operator
 import os
 import platform
+import statistics
 
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from pandas_datareader import data as web
-from sklearn.neighbors import KNeighborsClassifier
 from sklearn.preprocessing import StandardScaler
 
 HEADER_LONG = 'Long_MA'
@@ -25,6 +25,8 @@ HEADER_SD = 'Rolling SD'
 HEADER_PRICE = 'Adj Close'
 HEADER_YEAR = 'Year'
 HEADER_LABEL = 'Week Label'
+HEADER_OPEN = 'Open'
+HEADER_OVERNIGHT = 'Overnight Gain'
 
 
 def get_stock(ticker, start_date, end_date, s_window, l_window):
@@ -108,7 +110,205 @@ def label_good_weeks(good_weeks):
     return get_label
 
 
+def long_position_strategy(df, r):
+    current_balance = 100
+    pnl = []
+    for index, row in df.iterrows():
+        overnight_gain = row[HEADER_OVERNIGHT]
+        open_price = row[HEADER_OPEN]
+        close_price = row[HEADER_PRICE]
+        if overnight_gain * 100 > r:  # willing to trade
+            if overnight_gain == 0:  # do nothing
+                continue
+            # long position
+            num_stocks = current_balance / open_price
+            pnl.append((close_price - open_price) * num_stocks)
+    return pnl
+
+
+def short_position_strategy(df, r):
+    current_balance = 100
+    pnl = []
+    for index, row in df.iterrows():
+        overnight_gain = row[HEADER_OVERNIGHT]
+        open_price = row[HEADER_OPEN]
+        close_price = row[HEADER_PRICE]
+        if overnight_gain * 100 < r:  # willing to trade
+            if overnight_gain == 0:  # do nothing
+                continue
+            # long position
+            num_stocks = current_balance / open_price
+            pnl.append((open_price - close_price) * num_stocks)
+    return pnl
+
+
+def add_overnight_gains(gs_df):
+    overnight_gains = [0]
+    gs_df.loc[0, HEADER_OVERNIGHT] = 0
+    for i in range(1, len(gs_df)):
+        # (open - previous close) / previous close
+        open_price = gs_df.loc[i, HEADER_OPEN]
+        previous_close = gs_df.loc[i - 1, HEADER_PRICE]
+        gs_df.loc[i, HEADER_OVERNIGHT] = (open_price - previous_close) / previous_close
+        overnight_gains.append((open_price - previous_close) / previous_close)
+
+    gs_df[HEADER_OVERNIGHT] = overnight_gains
+
+
+def get_num_trades(trades):
+    """
+    Helper function to get the number of trades
+
+    :param trades: list of trades
+    :return: number of trades
+    """
+    return len(trades)
+
+
+def get_num_profitable_trades(trades):
+    """
+    Helper function to count the number of profitable trades
+
+    :param trades: list of trades
+    :return: number of profitable trades
+    """
+    return len([trade for trade in trades if trade >= 0])
+
+
+def get_num_losing_trades(trades):
+    """
+    Helper function to count the number of losing trades
+
+    :param trades: list of trades
+    :return: number of losing trades
+    """
+    return len([trade for trade in trades if trade < 0])
+
+
+def get_profit_per_profitable_trade(trades):
+    """
+    Helper function to calculate the average profit per profitable trade
+
+    :param trades: list of trades
+    :return: mean of profitable trades
+    """
+    profitable_trades = [trade for trade in trades if trade >= 0]
+    if len(profitable_trades) > 0:
+        return statistics.mean(profitable_trades)
+    else:
+        return 0
+
+
+def get_loss_per_losing_trade(trades):
+    """
+    Helper function to calculate the average loss per losing trade
+
+    :param trades: list of trades
+    :return: mean of losing trades
+    """
+    losing_trades = [trade for trade in trades if trade < 0]
+    if len(losing_trades) > 0:
+        return statistics.mean(losing_trades)
+    else:
+        return 0
+
+
+def print_trade_analysis(trades, r, descriptor):
+    """
+    Pretty print the trades
+
+    :param trades: list of trades
+    :return: void
+    """
+    print()
+    print(f'{descriptor} Trade Strategy Analysis R = {r}')
+    print('Trades\t# Profitable Trades\tProfit per Profitable Trade\t# Losing Trades\tLoss per Losing Trade')
+    num_trades = get_num_trades(trades)
+    num_prof_trades = get_num_profitable_trades(trades)
+    prof_per_prof_trade = get_profit_per_profitable_trade(trades)
+    num_losing_trades = get_num_losing_trades(trades)
+    loss_per_losing_trade = get_loss_per_losing_trade(trades)
+    print(f'{num_trades:6}\t{num_prof_trades:19}\t{prof_per_prof_trade:27.2f}\t{num_losing_trades:15}\t{loss_per_losing_trade:21.2f}')
+    # print('{:6}\t{:19}\t{:27.2f}\t{:15}\t{:21.2f}'.format(
+    #     num_trades, num_prof_trades, prof_per_prof_trade, num_losing_trades, loss_per_losing_trade))
+
+
 gs_df = get_data_table(end_date='2019-01-08')
+add_overnight_gains(gs_df)
+
+long_r = [1, 2, 3, 4, 5]
+short_r = [-1, -2, -3, -4, -5]
+gs_2018 = gs_df[gs_df['Year'] == 2018]
+full_r = []
+profitable_trades_percent = []
+avg_pnl = []
+for r in long_r:
+    full_r.append(r)
+    pnl = long_position_strategy(gs_2018, r)
+    if len(pnl) > 0:
+        percent = 100 * get_num_profitable_trades(pnl) / len(pnl)
+        profitable_trades_percent.append(percent)
+        avg_pnl.append(statistics.mean(pnl))
+        print_trade_analysis(pnl, r, 'Long')
+    else:
+        profitable_trades_percent.append(None)
+        avg_pnl.append(None)
+        print(f'No trades qualified for R = {r}')
+
+for r in short_r:
+    full_r.append(r)
+    pnl = short_position_strategy(gs_df, r)
+    if len(pnl) > 0:
+        percent = 100 * get_num_profitable_trades(pnl) / len(pnl)
+        profitable_trades_percent.append(percent)
+        avg_pnl.append(statistics.mean(pnl))
+        print_trade_analysis(pnl, r, 'Short')
+    else:
+        profitable_trades_percent.append(None)
+        avg_pnl.append(None)
+        print(f'No trades qualified for R = {r}')
+
+
+# Long Trade Strategy Analysis R = 0
+# Trades	# Profitable Trades	Profit per Profitable Trade	# Losing Trades	Loss per Losing Trade
+#    229	                 27	                       0.81	            202	                -1.74
+# Long Trade Strategy Analysis R = 1
+# Trades	# Profitable Trades	Profit per Profitable Trade	# Losing Trades	Loss per Losing Trade
+#    167	                 19	                       0.65	            148	                -1.72
+# Long Trade Strategy Analysis R = 2
+# Trades	# Profitable Trades	Profit per Profitable Trade	# Losing Trades	Loss per Losing Trade
+#     47	                  4	                       0.33	             43	                -1.91
+# Long Trade Strategy Analysis R = 3
+# Trades	# Profitable Trades	Profit per Profitable Trade	# Losing Trades	Loss per Losing Trade
+#      4	                  1	                       0.18	              3	                -1.65
+# No trades qualified for R = 4
+# No trades qualified for R = 5
+# Short Trade Strategy Analysis R = 0
+# Trades	# Profitable Trades	Profit per Profitable Trade	# Losing Trades	Loss per Losing Trade
+#     26	                 20	                       1.73	              6	                -2.29
+# Short Trade Strategy Analysis R = -1
+# Trades	# Profitable Trades	Profit per Profitable Trade	# Losing Trades	Loss per Losing Trade
+#      7	                  3	                       2.00	              4	                -2.09
+# Short Trade Strategy Analysis R = -2
+# Trades	# Profitable Trades	Profit per Profitable Trade	# Losing Trades	Loss per Losing Trade
+#      1	                  1	                       4.44	              0	                 0.00
+# No trades qualified for R = -3
+# No trades qualified for R = -4
+# No trades qualified for R = -5
+
+plt.scatter(x=full_r, y=avg_pnl)
+plt.xlabel('R')
+plt.ylabel('Average PNL')
+plt.title('Average PNL vs R')
+plt.show()
+
+plt.scatter(x=full_r, y=profitable_trades_percent)
+plt.xlabel('R')
+plt.ylabel('Profitable Trades Percent')
+plt.title('Percent of Profitable Trades vs R')
+plt.show()
+
+
 gs_df[HEADER_WEEK] = gs_df[HEADER_DATE].apply(get_week)
 # criteria for a good week is that the sum of the returns for each day of that week were positive:
 is_good_return_by_week = gs_df[HEADER_RETURN].groupby(gs_df[HEADER_WEEK]).sum() > 0
