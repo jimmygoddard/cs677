@@ -400,21 +400,6 @@ scaler = StandardScaler()
 X_train = scaler.fit_transform(X_train)
 X_test = scaler.fit_transform(X_test)
 
-# error_rate = []
-# for k in k_values:
-#     knn_classifier = KNeighborsClassifier(n_neighbors=k)
-#     knn_classifier.fit(X_train, Y_train)
-#     pred_k = knn_classifier.predict(X_test)
-#     error_rate.append(np.mean(pred_k != Y_test))
-#
-# x = k_values
-# y = error_rate
-# plt.title('Error Rate vs k')
-# plt.xlabel('number of neighbors: k')
-# plt.ylabel('Error Rate')
-# plt.plot(x, y, '-bo')
-# plt.show()
-
 
 def euclidean_distance(V):
     return np.linalg.norm(V, ord=2)
@@ -428,6 +413,7 @@ def minkowski_distance(V):
     return np.linalg.norm(V, ord=1.5)
 
 
+# knn code adapted from https://machinelearningmastery.com/tutorial-to-implement-k-nearest-neighbors-in-python-from-scratch/
 def get_neighbors(training_set, test_instance, k, distance):
     distances = []
     for datum in training_set:
@@ -469,3 +455,7 @@ for distance_func, label in distances:
     plt.ylabel('Error Rate')
     plt.plot(x, y, '-bo')
     plt.show()
+
+# The euclidean distance kNN gave the same results as previous when we were using the kNN library
+# The kNN using the Manhattan distance ended up at a better error rate when k was 11
+# The Minkowski kNN performed better than the other two at each value of k

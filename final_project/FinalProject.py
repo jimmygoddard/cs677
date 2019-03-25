@@ -88,4 +88,7 @@ plt.show()
 # maybe also show the same type of plot, but count id (secret, public, etc.) hair color, eye color
 
 # can do appearances by gender too
-app_by_gender = df[['']]
+app_by_gender_grouped = df.groupby(['sex'])['appearances'].sum().reset_index()
+
+# appearances by sexuality
+app_by_gsm = df.groupby(['gsm'])['appearances'].sum().reset_index()
