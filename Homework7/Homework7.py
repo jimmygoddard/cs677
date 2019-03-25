@@ -308,6 +308,64 @@ plt.ylabel('Profitable Trades Percent')
 plt.title('Percent of Profitable Trades vs R')
 plt.show()
 
+# Based on what the graphs show, I should reverse the strategies to consistently have better returns.
+# Both graphs show a high return for trades performed after there was a 2% loss in price from the night
+# before to the open of the current day.  However, only one trade qualified for that.  The rest of the
+# trades were generating consistent losses.  But if we reverse the strategy such that we sell short
+# if there was even a minor gain in price between close previous day and open current day, then the
+# profit to loss ratio should be positive.  We would also have to use the long strategy if there was even
+# a small loss in price between close previous day and open current day.  Below is the implementation of this
+# revised strategy
+long_r = [1, 2, 3, 4, 5]
+short_r = [-1, -2, -3, -4, -5]
+gs_2018 = gs_df[gs_df['Year'] == 2018]
+full_r = []
+profitable_trades_percent = []
+avg_pnl = []
+for r in long_r:
+    full_r.append(r)
+    pnl = short_position_strategy(gs_2018, r)
+    if len(pnl) > 0:
+        percent = 100 * get_num_profitable_trades(pnl) / len(pnl)
+        profitable_trades_percent.append(percent)
+        avg_pnl.append(statistics.mean(pnl))
+        print_trade_analysis(pnl, r, 'Long')
+    else:
+        profitable_trades_percent.append(None)
+        avg_pnl.append(None)
+        print(f'No trades qualified for R = {r}')
+
+for r in short_r:
+    full_r.append(r)
+    pnl = long_position_strategy(gs_df, r)
+    if len(pnl) > 0:
+        percent = 100 * get_num_profitable_trades(pnl) / len(pnl)
+        profitable_trades_percent.append(percent)
+        avg_pnl.append(statistics.mean(pnl))
+        print_trade_analysis(pnl, r, 'Short')
+    else:
+        profitable_trades_percent.append(None)
+        avg_pnl.append(None)
+        print(f'No trades qualified for R = {r}')
+
+
+plt.scatter(x=full_r, y=avg_pnl)
+plt.xlabel('R')
+plt.ylabel('Average PNL')
+plt.title('Average PNL vs R')
+plt.show()
+
+plt.scatter(x=full_r, y=profitable_trades_percent)
+plt.xlabel('R')
+plt.ylabel('Profitable Trades Percent')
+plt.title('Percent of Profitable Trades vs R')
+plt.show()
+
+# Looking at the graphs this strategy generates shows that we should take a long position for
+# days where there was a gain in price from night before to open day of.  And we should not use
+# the short strategy for when there was a loss in price from night before to open day of.
+
+
 
 gs_df[HEADER_WEEK] = gs_df[HEADER_DATE].apply(get_week)
 # criteria for a good week is that the sum of the returns for each day of that week were positive:
