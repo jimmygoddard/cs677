@@ -26,8 +26,8 @@ dc_df.columns = dc_df.columns.str.lower()
 
 df = pd.concat([marvel_df, dc_df], ignore_index=True)
 
-# sns.pairplot(df)
-# plt.show()
+sns.pairplot(df)
+plt.show()
 
 year = df['year'].dropna().astype(int)
 sns.distplot(year)
@@ -92,3 +92,9 @@ app_by_gender_grouped = df.groupby(['sex'])['appearances'].sum().reset_index()
 
 # appearances by sexuality
 app_by_gsm = df.groupby(['gsm'])['appearances'].sum().reset_index()
+
+# build classifiers to classify gender:
+# 1) a knn - https://scikit-learn.org/stable/modules/generated/sklearn.neighbors.KNeighborsClassifier.html
+# 2) neural net classifier - https://medium.com/datadriveninvestor/building-neural-network-using-keras-for-classification-3a3656c726c1
+# 3) naive bayesian - https://scikit-learn.org/stable/modules/naive_bayes.html
+
