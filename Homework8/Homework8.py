@@ -221,6 +221,17 @@ print(lr_acc_table)
 
 total = pd.concat([training, testing]).reset_index(drop=True)
 total.plot.scatter(x='mean', y='std', c=total['label'])
+plt.show()
+
+
+# this works well for a diagonal line
+m = 0.03 / 0.02
+# y = 1.5x + 0.02
+greens = total[(total['std'] < m * total['mean'] + 0.02) & (total['label'] == 'green')]
+reds = total[(total['std'] > m * total['mean'] + 0.02) & (total['label'] == 'red')]
+new_df = pd.concat([greens, reds]).reset_index(drop=True)
+new_df.plot.scatter(x='mean', y='std', c=new_df['label'])
+plt.show()
 
 # line y = x (std = mean).  Above line is red, below is green.  Neither this nor the reverse of green above and red below
 # work well
@@ -239,5 +250,8 @@ y = new_df['std']
 c = new_df['label']
 fig, ax = plt.subplots()
 plt.scatter(x=x, y=y, c=c)
+plt.title('Mean vs Standard deviation')
+plt.xlabel('Mean')
+plt.ylabel('Standard deviation')
 ax.axvline(x=0)
 plt.show()
