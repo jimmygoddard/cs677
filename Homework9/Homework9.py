@@ -172,6 +172,7 @@ y_hat_values = np.empty(len(df))
 y_hat_values.fill(np.nan)
 learning_rates = np.arange(0.01, 0.06, 0.01)
 for l in learning_rates:
+    print(f'Calculating gradient descent linear regressions for for learning rate {l}')
     for r_idx, row in df.iterrows():
         window = df[r_idx:r_idx + w]
         x = window[HEADER_PRICE]
@@ -179,9 +180,7 @@ for l in learning_rates:
         m, b, error = gradient_descent(x, y, l)
         if np.isnan(m) or np.isnan(b):
             raise Exception(f'm={m} or b={b} is NaN')
-        # print(f'learning rate: {l} slope: {m} intercept: {b} error: {error}')
         try:
-            # y_hat = model(df[HEADER_PRICE][r_idx + w])
             y_hat = m * df[HEADER_PRICE][r_idx + w] + b
             y_hat_values[r_idx + w] = y_hat
         except KeyError:
@@ -261,9 +260,9 @@ plt.figure(1, figsize=(4, 3))
 # Plot also the training points
 plt.scatter(x, y, c=c)
 # xx, yy = np.meshgrid(np.arange(x_min, x_max, h), np.arange(y_min, y_max, h))
-plt.xlim(xx.min(), xx.max())
-plt.ylim(yy.min(), yy.max())
-plt.xticks(())
-plt.yticks(())
+# plt.xlim(xx.min(), xx.max())
+# plt.ylim(yy.min(), yy.max())
+# plt.xticks(())
+# plt.yticks(())
 
 plt.show()
