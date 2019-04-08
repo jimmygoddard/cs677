@@ -247,10 +247,23 @@ buffer = 0.015
 x_min, x_max = X.values[:, 0].min() - buffer, X.values[:, 0].max() + buffer
 y_min, y_max = X.values[:, 1].min() - buffer, X.values[:, 1].max() + buffer
 h = .02  # step size in the mesh
+
+# this is right out of the sklearn documentation:
+# https://scikit-learn.org/stable/auto_examples/linear_model/plot_iris_logistic.html
+# but I can't get it to work properly
+# it's supposed to show the decision boundary for the logistic regression
 xx, yy = np.meshgrid(np.arange(x_min, x_max, h), np.arange(y_min, y_max, h))
 Z = log_reg_classifier.predict(np.c_[xx.ravel(), yy.ravel()])
 Z = Z.reshape(xx.shape)
+plt.figure(1, figsize=(4, 3))
+# plt.pcolormesh(xx, yy, Z, cmap=plt.cm.Paired)
 
 # Plot also the training points
 plt.scatter(x, y, c=c)
+# xx, yy = np.meshgrid(np.arange(x_min, x_max, h), np.arange(y_min, y_max, h))
+plt.xlim(xx.min(), xx.max())
+plt.ylim(yy.min(), yy.max())
+plt.xticks(())
+plt.yticks(())
+
 plt.show()
