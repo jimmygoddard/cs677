@@ -1,15 +1,15 @@
 """
 Jimmy Goddard
-4/13/19
+4/15/19
 CS 677 Assignment 10
 """
 import datetime
 import os
 import platform
 
-import pandas as pd
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
 from pandas_datareader import data as web
 from sklearn import svm
 from sklearn.preprocessing import StandardScaler
@@ -102,9 +102,9 @@ def get_week(local_date):
 def label_good_weeks(good_weeks):
     def get_label(local_date):
         if local_date in good_weeks:
-            return 'green'
+            return 0  # 'green'
         else:
-            return 'red'
+            return 1  # 'red'
     return get_label
 
 
@@ -140,26 +140,39 @@ Y_test = testing[['label']].values.ravel()
 
 X_train = StandardScaler().fit_transform(X_train)
 
-svm_classifier = svm.SVC(kernel='linear')
-svm_classifier.fit(X_train, Y_train)
-predicted = svm_classifier.predict(X_test)
+svm_linear = svm.SVC(kernel='linear')
+svm_linear.fit(X_train, Y_train)
+predicted = svm_linear.predict(X_test)
 accuracy = np.mean(predicted == Y_test)
 print(f'Linear SVM accuracy is {accuracy}')
 
-svm_classifier = svm.SVC(kernel='rbf')
-svm_classifier.fit(X_train, Y_train)
-predicted = svm_classifier.predict(X_test)
+svm_gaussian = svm.SVC(kernel='rbf')
+svm_gaussian.fit(X_train, Y_train)
+predicted = svm_gaussian.predict(X_test)
 accuracy = np.mean(predicted == Y_test)
 print(f'Gaussian SVM accuracy is {accuracy}')
 
 degrees = [2, 5, 9]
+svm_poly = []
 for degree in degrees:
     svm_classifier = svm.SVC(kernel='poly', degree=degree)
     svm_classifier.fit(X_train, Y_train)
+    svm_poly.append((svm_classifier, degree))
     predicted = svm_classifier.predict(X_test)
     accuracy = np.mean(predicted == Y_test)
     print(f'Polynomial of degree {degree} SVM accuracy is {accuracy}')
 
+
+# The linear SVM model had the accuracy as the polynomial SVM models even though the polynomial kernels appeared quite
+# different.  See Graphs for details of the different shapes each SVM model took.
+# Linear SVM accuracy is 0.5192307692307693
+# Gaussian SVM accuracy is 0.4807692307692308
+# Polynomial of degree 2 SVM accuracy is 0.5192307692307693
+# Polynomial of degree 5 SVM accuracy is 0.5192307692307693
+# Polynomial of degree 9 SVM accuracy is 0.5192307692307693
+
+# The following graphing code adapted from
+# https://scikit-learn.org/stable/auto_examples/svm/plot_iris.html#sphx-glr-auto-examples-svm-plot-iris-py
 
 def make_meshgrid(x, y, h=.02):
     """Create a mesh of points to plot in
@@ -198,44 +211,29 @@ def plot_contours(ax, clf, xx, yy, **params):
     return out
 
 
-# import some data to play with
-# iris = datasets.load_iris()
-# # Take the first two features. We could avoid this by using a two-dim dataset
-# X = iris.data[:, :2]
-# y = iris.target
-
-# we create an instance of SVM and fit out data. We do not scale our
-# data since we want to plot the support vectors
-C = 1.0  # SVM regularization parameter
-
-# FIXME use my models
-models = (svm.SVC(kernel='linear', C=C),
-          svm.LinearSVC(C=C),
-          svm.SVC(kernel='rbf', gamma=0.7, C=C),
-          svm.SVC(kernel='poly', degree=3, C=C))
-models = (clf.fit(X, y) for clf in models)
-
-# FIXME title for the plots
+models = (svm_linear, svm_gaussian, svm_poly[0][0], svm_poly[1][0], svm_poly[2][0])
 titles = ('SVC with linear kernel',
-          'LinearSVC (linear kernel)',
-          'SVC with RBF kernel',
-          'SVC with polynomial (degree 3) kernel')
+          'SVC with gaussian kernel',
+          f'SVC with polynomial degree {svm_poly[0][1]} kernel',
+          f'SVC with polynomial degree {svm_poly[1][1]} kernel',
+          f'SVC with polynomial degree {svm_poly[2][1]} kernel')
 
-# Set-up 2x2 grid for plotting.
-fig, sub = plt.subplots(2, 2)
+
+# Set-up 3x2 grid for plotting.
+fig, sub = plt.subplots(3, 2)
 plt.subplots_adjust(wspace=0.4, hspace=0.4)
 
-X0, X1 = X[:, 0], X[:, 1]
+X0, X1 = X_train[:, 0], X_train[:, 1]
 xx, yy = make_meshgrid(X0, X1)
 
 for clf, title, ax in zip(models, titles, sub.flatten()):
     plot_contours(ax, clf, xx, yy,
                   cmap=plt.cm.coolwarm, alpha=0.8)
-    ax.scatter(X0, X1, c=y, cmap=plt.cm.coolwarm, s=20, edgecolors='k')
+    ax.scatter(X0, X1, c=Y_train, cmap=plt.cm.coolwarm, s=20, edgecolors='k')
     ax.set_xlim(xx.min(), xx.max())
     ax.set_ylim(yy.min(), yy.max())
-    ax.set_xlabel('Sepal length')
-    ax.set_ylabel('Sepal width')
+    ax.set_xlabel('Mean')
+    ax.set_ylabel('Standard Deviation')
     ax.set_xticks(())
     ax.set_yticks(())
     ax.set_title(title)
