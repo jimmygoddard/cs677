@@ -141,6 +141,7 @@ decision_tree.fit(X_train, Y_train)
 prediction = decision_tree.predict(X_test)
 accuracy = np.mean(prediction == Y_test)
 print(f'Accuracy for decision tree using entropy as its criterion is {accuracy}')
+# Accuracy for decision tree using entropy as its criterion is 0.6538461538461539
 
 # iris example from https://scikit-learn.org/stable/modules/tree.html
 # >>> dot_data = tree.export_graphviz(clf, out_file=None,
