@@ -88,9 +88,10 @@ plt.show()
 sex_year_df = df[['year', 'sex']]
 sex_year_df_grouped = sex_year_df.groupby(['year', 'sex']).size().reset_index(name='counts')
 
-male_df = df[['year', 'sex']][df.sex == 'Male Characters']
-female_df = df[['year', 'sex']][df.sex == 'Female Characters']
+male_df = df[df.sex == 'Male Characters']
+female_df = df[df.sex == 'Female Characters']
 male_female_df = pd.concat([male_df, female_df], ignore_index=True)
+male_female_df.drop(['page_id', 'urlslug'], axis=1)
 male_female_df_grouped = male_female_df.groupby(['year', 'sex']).size().reset_index(name='counts')
 sns.lineplot(x='year', y='counts', hue='sex', data=male_female_df_grouped)
 plt.title('New heroes per year by gender (only male/female)')
@@ -102,16 +103,21 @@ sns.lineplot(x='year', y='counts', hue='sex', data=sex_year_df_grouped)
 plt.title('New heroes per year by gender')
 plt.show()
 
+
+
 # maybe also show the same type of plot, but count id (secret, public, etc.) alignment, eye/hair, or alive?
 
 # can do appearances by gender too
-app_by_gender_grouped = df.groupby(['sex'])['appearances'].sum().reset_index()
+app_by_gender_grouped = df.groupby(['sex'])['appearances'].count().reset_index()
 
 # appearances by sexuality
-app_by_gsm = df.groupby(['gsm'])['appearances'].sum().reset_index()
+app_by_gsm = df.groupby(['gsm'])['appearances'].count().reset_index()
 
 # build classifiers to classify gender:
 # 1) a knn - https://scikit-learn.org/stable/modules/generated/sklearn.neighbors.KNeighborsClassifier.html
 # 2) neural net classifier - https://medium.com/datadriveninvestor/building-neural-network-using-keras-for-classification-3a3656c726c1
 # 3) naive bayesian - https://scikit-learn.org/stable/modules/naive_bayes.html
 
+sns.catplot(x='year', y='sex', data=male_female_df, kind='boxen')
+plt.title('New Heroes per Year by Gender')
+plt.show()
