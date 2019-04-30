@@ -1,3 +1,8 @@
+"""
+Jimmy Goddard
+CS 677 Final Project
+04/29/19
+"""
 import os
 import platform
 import time
